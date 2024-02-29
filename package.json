@@ -1,5 +1,5 @@
 {
-  "name": "rapipdf",
+  "name": "@perfectmemory/rapipdf",
   "version": "2.2.1",
   "description": "RapiPdf - Generate PDF from Open API spec",
   "author": "Mrinmoy Majumdar <mrin9@yahoo.com>",
