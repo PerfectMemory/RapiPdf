@@ -181,21 +181,30 @@ function getParameterTableDef(parameters, paramType, localize, includeExample = 
   ];
 }
 
-function getExamplesDef(contentTypeObj, localizedExampleLabel) {
+function getExamplesDef(contentTypeObj, localizedExampleLabel, baseMargin = 20) {
   const exampleSectionDef = [];
   if (contentTypeObj.example) {
     exampleSectionDef.push([
-      { text: `${localizedExampleLabel}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
-      { text: JSON.stringify(contentTypeObj.example, null, '\u200B \u200B'), margin: [40, 10, 0, 0], style: 'monoSub' },
+      { text: `${localizedExampleLabel}:`, margin: [baseMargin, 10, 0, 0], style: ['small', 'b'] },
+      { text: JSON.stringify(contentTypeObj.example, null, '\u200B \u200B'), margin: [baseMargin, 10, 0, 0], style: 'monoSub' },
     ]);
   }
   if (contentTypeObj.examples) {
-    let iterCount = 0;
-    for (const oneExample in contentTypeObj.examples) {
-      exampleSectionDef.push([
-        { text: `${localizedExampleLabel} ${++iterCount}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
-        { text: JSON.stringify(oneExample, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
-      ]);
+    if (Array.isArray(contentTypeObj.examples)) {
+      let iterCount = 0;
+      for (const oneExample in contentTypeObj.examples) {
+        exampleSectionDef.push([
+          { text: `${localizedExampleLabel} ${++iterCount}:`, margin: [baseMargin, 10, 0, 0], style: ['small', 'b'] },
+          { text: JSON.stringify(oneExample, null, '\u200B \u200B'), margin: [baseMargin, 10, 0, 0], style: 'monoSub' },
+        ]);
+      }
+    } else if (typeof contentTypeObj.examples === 'object') {
+      Object.entries(contentTypeObj.examples).forEach(([key, example], index) => {
+        exampleSectionDef.push([
+          { text: `${localizedExampleLabel} ${index + 1}: ${example.summary || key}`, margin: [baseMargin, 10, 0, 0], style: ['small', 'b'] },
+          { text: JSON.stringify(example.value, null, '\u200B \u200B'), margin: [baseMargin, 10, 0, 0], style: 'monoSub' },
+        ]);
+      });
     }
   }
   return exampleSectionDef;
@@ -261,7 +270,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = 
     }
 
     if (includeExample) {
-      content.push(getExamplesDef(contentTypeObj, localize.example));
+      content.push(getExamplesDef(contentTypeObj, localize.example, 0));
     }
   }
   return content;
@@ -325,7 +334,7 @@ function getResponseDef(responses, schemaStyle, localize, includeExample = false
         }
       }
       if (includeExample) {
-        responseDef.push(getExamplesDef(contentTypeObj, localize.example));
+        responseDef.push(getExamplesDef(contentTypeObj, localize.example, 10));
       }
       allResponseDefs.push(responseDef);
     }
